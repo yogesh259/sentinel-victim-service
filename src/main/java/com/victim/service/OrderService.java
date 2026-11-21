@@ -13,10 +13,12 @@ public class OrderService {
     private final List<Map<String, Object>> orders = new ArrayList<>();
     private final PaymentService paymentService;
     private final DiscountCatalog discountCatalog;
+    private final PricingService pricingService;
 
-    public OrderService(PaymentService paymentService, DiscountCatalog discountCatalog) {
+    public OrderService(PaymentService paymentService, DiscountCatalog discountCatalog, PricingService pricingService) {
         this.paymentService = paymentService;
         this.discountCatalog = discountCatalog;
+        this.pricingService = pricingService;
     }
 
     public List<Map<String, Object>> listOrders() {
@@ -28,6 +30,7 @@ public class OrderService {
         String discountCode = (String) body.get("discountCode");
         BigDecimal amount = new BigDecimal(body.get("amount").toString());
         amount = discountCatalog.apply(amount, discountCode);
+        amount = pricingService.priceFor(customerId, amount);
 
         String txnId = paymentService.chargeCustomer(customerId, amount);
 
