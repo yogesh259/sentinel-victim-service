@@ -33,6 +33,7 @@ public class OrderService {
         String customerId = String.valueOf(body.get("customerId"));
         String discountCode = (String) body.get("discountCode");
         BigDecimal amount = new BigDecimal(body.get("amount").toString());
+        int quantity = Integer.parseInt(String.valueOf(body.getOrDefault("quantity", 1)));
         amount = discountCatalog.apply(amount, discountCode);
         amount = pricingService.priceFor(customerId, amount);
 
@@ -42,6 +43,7 @@ public class OrderService {
         Map<String, Object> order = new HashMap<>();
         order.put("customerId", customerId);
         order.put("amount", amount);
+        order.put("quantity", quantity);
         order.put("transactionId", txnId);
         order.put("discountCode", discountCode);
         order.put("status", "confirmed");
