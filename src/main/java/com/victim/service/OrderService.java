@@ -1,5 +1,6 @@
 package com.victim.service;
 
+import com.victim.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -14,11 +15,14 @@ public class OrderService {
     private final PaymentService paymentService;
     private final DiscountCatalog discountCatalog;
     private final PricingService pricingService;
+    private final OrderRepository orderRepository;
 
-    public OrderService(PaymentService paymentService, DiscountCatalog discountCatalog, PricingService pricingService) {
+    public OrderService(PaymentService paymentService, DiscountCatalog discountCatalog,
+                        PricingService pricingService, OrderRepository orderRepository) {
         this.paymentService = paymentService;
         this.discountCatalog = discountCatalog;
         this.pricingService = pricingService;
+        this.orderRepository = orderRepository;
     }
 
     public List<Map<String, Object>> listOrders() {
@@ -33,6 +37,7 @@ public class OrderService {
         amount = pricingService.priceFor(customerId, amount);
 
         String txnId = paymentService.chargeCustomer(customerId, amount);
+        orderRepository.save(customerId, amount, txnId);
 
         Map<String, Object> order = new HashMap<>();
         order.put("customerId", customerId);
