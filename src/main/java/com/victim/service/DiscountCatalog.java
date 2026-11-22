@@ -19,6 +19,8 @@ public class DiscountCatalog {
     private static Map<String, Discount> load() {
         List<Discount> discounts = List.of(
             new Discount("SAVE10", new BigDecimal("0.90")),
+            new Discount("SAVE15", new BigDecimal("0.85")),
+            new Discount("SAVE10", new BigDecimal("0.75")),
             new Discount("SAVE20", new BigDecimal("0.80"))
         );
         return discounts.stream().collect(Collectors.toMap(Discount::code, Function.identity()));
