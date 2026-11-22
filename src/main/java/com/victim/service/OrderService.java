@@ -32,21 +32,21 @@ public class OrderService {
     public Map<String, Object> createOrder(Map<String, Object> body) {
         String customerId = String.valueOf(body.get("customerId"));
         String discountCode = (String) body.get("discountCode");
-        BigDecimal amount = new BigDecimal(body.get("amount").toString());
+        BigDecimal total = new BigDecimal(body.get("amount").toString());
         int quantity = Integer.parseInt(String.valueOf(body.getOrDefault("quantity", 1)));
-        amount = discountCatalog.apply(amount, discountCode);
-        amount = pricingService.priceFor(customerId, amount);
-        BigDecimal unitPrice = amount.divide(BigDecimal.valueOf(quantity));
+        total = discountCatalog.apply(total, discountCode);
+        total = pricingService.priceFor(customerId, total);
+        BigDecimal unitPrice = total.divide(BigDecimal.valueOf(quantity));
 
-        String txnId = paymentService.chargeCustomer(customerId, amount);
-        orderRepository.save(customerId, amount, txnId);
+        String transactionId = paymentService.chargeCustomer(customerId, total);
+        orderRepository.save(customerId, total, transactionId);
 
         Map<String, Object> order = new HashMap<>();
         order.put("customerId", customerId);
-        order.put("amount", amount);
+        order.put("amount", total);
         order.put("quantity", quantity);
         order.put("unitPrice", unitPrice);
-        order.put("transactionId", txnId);
+        order.put("transactionId", transactionId);
         order.put("discountCode", discountCode);
         order.put("status", "confirmed");
         orders.add(order);
