@@ -36,6 +36,7 @@ public class OrderService {
         int quantity = Integer.parseInt(String.valueOf(body.getOrDefault("quantity", 1)));
         amount = discountCatalog.apply(amount, discountCode);
         amount = pricingService.priceFor(customerId, amount);
+        BigDecimal unitPrice = amount.divide(BigDecimal.valueOf(quantity));
 
         String txnId = paymentService.chargeCustomer(customerId, amount);
         orderRepository.save(customerId, amount, txnId);
@@ -44,6 +45,7 @@ public class OrderService {
         order.put("customerId", customerId);
         order.put("amount", amount);
         order.put("quantity", quantity);
+        order.put("unitPrice", unitPrice);
         order.put("transactionId", txnId);
         order.put("discountCode", discountCode);
         order.put("status", "confirmed");
